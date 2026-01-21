@@ -1,14 +1,14 @@
 // --- CONFIGURATION ---
-vec4 TRAIL_COLOR = iCurrentCursorColor; // can change to eg: vec4(0.2, 0.6, 1.0, 0.5);
-const float DURATION = 0.2; // total animation time
-const float TRAIL_SIZE = 0.8; // 0.0 = all corners move together. 1.0 = max smear (leading corners jump instantly)
-const float THRESHOLD_MIN_DISTANCE = 1.5; // min distance to show trail (units of cursor height)
-const float BLUR = 1.0; // blur size in pixels (for antialiasing)
-const float TRAIL_THICKNESS = 1.0;  // 1.0 = full cursor height, 0.0 = zero height, >1.0 = funky aah
-const float TRAIL_THICKNESS_X = 0.9;
+vec4 TRAIL_COLOR = vec4(0.733, 0.486, 1.0, 0.8); // Violet from theme (#bb7cff)
+const float DURATION = 0.22; // Slightly longer for smoother flow
+const float TRAIL_SIZE = 0.75; // 0.0 = all corners move together. 1.0 = max smear
+const float THRESHOLD_MIN_DISTANCE = 1.2; // min distance to show trail
+const float BLUR = 2.0; // Softer edges for smoother look
+const float TRAIL_THICKNESS = 0.95;  // Sleeker trail
+const float TRAIL_THICKNESS_X = 0.95;
 
-const float FADE_ENABLED = 0.0; // 1.0 to enable fade gradient along the trail, 0.0 to disable
-const float FADE_EXPONENT = 5.0; // exponent for fade gradient along the trail
+const float FADE_ENABLED = 1.0; // Enable fade for smoother trailing
+const float FADE_EXPONENT = 3.5; // Exponent for the fade gradient
 
 // --- CONSTANTS for easing functions ---
 const float PI = 3.14159265359;
@@ -37,10 +37,10 @@ const float SPRING_DAMPING = 0.9;
 //     return 1.0 - pow(1.0 - x, 3.0);
 // }
 
-// // EaseOutQuart
-// float ease(float x) {
-//     return 1.0 - pow(1.0 - x, 4.0);
-// }
+// EaseOutQuart
+float ease(float x) {
+    return 1.0 - pow(1.0 - x, 4.0);
+}
 
 // // EaseOutQuint
 // float ease(float x) {
@@ -57,10 +57,10 @@ const float SPRING_DAMPING = 0.9;
 //     return x == 1.0 ? 1.0 : 1.0 - pow(2.0, -10.0 * x);
 // }
 
-// EaseOutCirc
-float ease(float x) {
-    return sqrt(1.0 - pow(x - 1.0, 2.0));
-}
+// // EaseOutCirc
+// float ease(float x) {
+//     return sqrt(1.0 - pow(x - 1.0, 2.0));
+// }
 
 // // EaseOutBack
 // float ease(float x) {
@@ -270,7 +270,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
         // tiny epsilon to avoid division by zero if moveVec is (0,0)
         float fadeProgress = clamp(dot(fragVec, moveVec) / (dot(moveVec, moveVec) + 1e-6), 0.0, 1.0);
 
-        vec4 trail = TRAIL_COLOR;
+        vec4 colorHead = TRAIL_COLOR;
+        vec4 colorTail = vec4(0.161, 0.678, 1.0, 0.5); // Blue (#29adff)
+        vec4 trail = mix(colorTail, colorHead, fadeProgress);
 
         float effectiveBlur = BLUR;
         if (BLUR < 2.5) {
