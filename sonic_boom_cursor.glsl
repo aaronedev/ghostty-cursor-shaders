@@ -1,8 +1,18 @@
-// CONFIGURATION
+// --- THEME COLORS ---
+const vec3 C_BG = vec3(0.059, 0.059, 0.059);     // #0f0f0f
+const vec3 C_CYAN = vec3(0.0, 1.0, 0.976);       // #00fff9
+const vec3 C_BLUE = vec3(0.161, 0.678, 1.0);     // #29adff
+
+// --- BLEND CALCULATION ---
+// Adjust blend factor to match wezterm config (0.7)
+const float BLEND_FACTOR = 0.7;
+#define BLEND_BG(color, factor) mix(C_BG, color, factor)
+
+// --- CONFIGURATION ---
 const float DURATION = 0.15;               // How long the ripple animates (seconds)
 const float MAX_RADIUS = 0.06;             // Max radius in normalized coords (0.5 = 1/4 screen height)
 const float ANIMATION_START_OFFSET = 0.0;        // Start the ripple slightly progressed (0.0 - 1.0)
-vec4 COLOR = vec4(0.35, 0.36, 0.44, 1.0); // change to iCurrentCursorColor for your cursor's color
+vec4 COLOR = vec4(BLEND_BG(C_CYAN, BLEND_FACTOR), 0.8);
 const float CURSOR_WIDTH_CHANGE_THRESHOLD = 0.5; // Triggers ripple if cursor width changes by this fraction
 const float BLUR = 3.0;                    // Blur level in pixels
 

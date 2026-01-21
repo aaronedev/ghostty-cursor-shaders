@@ -1,5 +1,19 @@
-// -- CONFIGURATION --
-vec4 TRAIL_COLOR = iCurrentCursorColor; // can change to eg: vec4(0.2, 0.6, 1.0, 0.5);
+// --- THEME COLORS ---
+const vec3 C_BG = vec3(0.059, 0.059, 0.059);     // #0f0f0f
+const vec3 C_CYAN = vec3(0.0, 1.0, 0.976);       // #00fff9
+const vec3 C_BLUE = vec3(0.161, 0.678, 1.0);     // #29adff
+
+// --- BLEND CALCULATION ---
+// Adjust blend factor to match wezterm config (0.7)
+const float BLEND_FACTOR = 0.7;
+#define BLEND_BG(color, factor) mix(C_BG, color, factor)
+
+// --- CONFIGURATION ---
+// Cursor Head (matches wezterm cursor_bg)
+vec4 TRAIL_COLOR = vec4(BLEND_BG(C_CYAN, BLEND_FACTOR), 0.8);
+// Cursor Tail (blended blue for consistency)
+vec4 TAIL_COLOR_CONFIG = vec4(BLEND_BG(C_BLUE, BLEND_FACTOR), 0.5);
+
 const float DURATION = 0.09; // in seconds
 const float MAX_TRAIL_LENGTH = 0.2;
 const float THRESHOLD_MIN_DISTANCE = 1.5; // min distance to show trail (units of cursor width)
@@ -222,7 +236,14 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
         // -- FINAL SELECTING AND DRAWING --
         float sdfTrail = mix(sdfTrail_diag, sdfTrail_rect, isStraightMove);
         
-        vec4 trail = TRAIL_COLOR;
+        // --- FADE GRADIENT CALCULATION ---
+        vec2 fragVec = vu - centerCP;
+        vec2 moveVec = centerCC - centerCP;
+        // project fragment onto movement vector, normalize to [0, 1]
+        float fadeProgress = clamp(dot(fragVec, moveVec) / (dot(moveVec, moveVec) + 1e-6), 0.0, 1.0);
+
+        vec4 trail = mix(TAIL_COLOR_CONFIG, TRAIL_COLOR, fadeProgress);
+
         float trailAlpha = antialising(sdfTrail);
         newColor = mix(newColor, trail, trailAlpha);
 
