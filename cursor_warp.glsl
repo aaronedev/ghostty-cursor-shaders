@@ -1,5 +1,19 @@
+// --- THEME COLORS ---
+const vec3 C_BG = vec3(0.059, 0.059, 0.059);     // #0f0f0f
+const vec3 C_CYAN = vec3(0.0, 1.0, 0.976);       // #00fff9
+const vec3 C_BLUE = vec3(0.161, 0.678, 1.0);     // #29adff
+
+// --- BLEND CALCULATION ---
+// Adjust blend factor to match wezterm config (0.7)
+const float BLEND_FACTOR = 0.7;
+#define BLEND_BG(color, factor) mix(C_BG, color, factor)
+
 // --- CONFIGURATION ---
-vec4 TRAIL_COLOR = vec4(0.733, 0.486, 1.0, 0.8); // Violet from theme (#bb7cff)
+// Cursor Head (matches wezterm cursor_bg)
+vec4 TRAIL_COLOR = vec4(BLEND_BG(C_CYAN, BLEND_FACTOR), 0.8);
+// Cursor Tail (blended blue for consistency)
+vec4 TAIL_COLOR_CONFIG = vec4(BLEND_BG(C_BLUE, BLEND_FACTOR), 0.5);
+
 const float DURATION = 0.22; // Slightly longer for smoother flow
 const float TRAIL_SIZE = 0.75; // 0.0 = all corners move together. 1.0 = max smear
 const float THRESHOLD_MIN_DISTANCE = 1.2; // min distance to show trail
@@ -271,7 +285,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
         float fadeProgress = clamp(dot(fragVec, moveVec) / (dot(moveVec, moveVec) + 1e-6), 0.0, 1.0);
 
         vec4 colorHead = TRAIL_COLOR;
-        vec4 colorTail = vec4(0.161, 0.678, 1.0, 0.5); // Blue (#29adff)
+        vec4 colorTail = TAIL_COLOR_CONFIG;
         vec4 trail = mix(colorTail, colorHead, fadeProgress);
 
         float effectiveBlur = BLUR;
