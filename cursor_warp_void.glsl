@@ -20,6 +20,7 @@ const float TRAIL_THICKNESS_X = 0.95;
 
 const float FADE_ENABLED = 1.0; 
 const float FADE_EXPONENT = 3.5; // Smoother, more natural exponential fade
+const float MAX_TRAIL_DISTANCE = 8.0; // Max distance in cursor widths to draw a trail
 
 // --- CONSTANTS ---
 const float PI = 3.14159265359;
@@ -93,8 +94,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
 
     vec4 newColor = vec4(fragColor);
     float baseProgress = iTime - iTimeCursorChange;
+    float maxDist = currentCursor.w * MAX_TRAIL_DISTANCE;
 
-    if (lineLength > minDist && baseProgress < DURATION - 0.001) {
+    if (lineLength > minDist && lineLength < maxDist && baseProgress < DURATION - 0.001) {
         float cc_half_height = currentCursor.w * 0.5;
         float cc_center_y = currentCursor.y - cc_half_height;
         float cc_new_top_y = cc_center_y + cc_half_height * TRAIL_THICKNESS;
